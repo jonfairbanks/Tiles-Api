@@ -49,10 +49,19 @@ io.on("connection", socket => {
   emitBoardState(socket);
 
 
+  socket.on("updateTile", tileUpdateData => {
+    console.log("Tile change received" + tileUpdateData);
+    //boardCurrentState = desiredState;
+
+    boardCurrentState.tiles[tileUpdateData.x][tileUpdateData.y] = tileUpdateData.color
+    socket.broadcast.emit('updateTile', tileUpdateData);
+  });
 
   socket.on("updateTiles", tileUpdateData => {
     console.log("Tile change received" + tileUpdateData);
-    //boardCurrentState = desiredState;
+    for (var i = 0; i < tileUpdateData.length; i++){
+      boardCurrentState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color
+    }
     socket.broadcast.emit('updateTiles', tileUpdateData);
     
   });
