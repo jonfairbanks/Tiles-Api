@@ -31,7 +31,7 @@ var boardCurrentState = {
   connections: 0,
   activeColor: activeColor,
   baseColor: baseColor,
-  tiles: createTileGrid(24, 24, baseColor)
+  tiles: createTileGrid(65, 170, baseColor)
 };
 
 // use below link to create 2D array function
