@@ -31,7 +31,7 @@ var boardCurrentState = {
   connections: 0,
   activeColor: activeColor,
   baseColor: baseColor,
-  tiles: createTileGrid(65, 170, baseColor)
+  tiles: createTileGrid(110, 275, baseColor)
 };
 
 // use below link to create 2D array function
@@ -48,11 +48,13 @@ io.on("connection", socket => {
   //Tell new client of current boardState
   emitBoardState(socket);
 
-  //Listen for updates to board state from client, store, and rebroadcast the new state
-  socket.on("updateBoardState", desiredState => {
-    console.log("Update received" + desiredState);
-    boardCurrentState = desiredState;
-    socket.broadcast.emit('setBoardState', boardCurrentState);
+
+
+  socket.on("updateTiles", tileUpdateData => {
+    console.log("Tile change received" + tileUpdateData);
+    //boardCurrentState = desiredState;
+    socket.broadcast.emit('updateTiles', tileUpdateData);
+    
   });
 
   //Log disconnects
