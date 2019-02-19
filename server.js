@@ -5,10 +5,18 @@ const socketIo = require("socket.io");
 const axios = require("axios");
 const port = process.env.PORT || 4001;
 const index = require("./routes/index");
+const bodyParser = require('body-parser');
+
+// Import models and initialize database
+const { connectDb } = require("./models");
+const Tile = require("./models/tile");
 
 // Define and setup server
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({'extended':'true'}));
 app.use(index);
+
 
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -30,8 +38,7 @@ function createTileGrid(width, height, baseColor){
 var boardCurrentState = {
   connections: 0,
   activeColor: activeColor,
-  baseColor: baseColor,
-  tiles: createTileGrid(110, 275, baseColor)
+  baseColor: baseColor
 };
 
 // use below link to create 2D array function
@@ -42,44 +49,66 @@ var boardCurrentState = {
 io.on("connection", socket => {
   console.log("New client connected");
 
-  boardCurrentState.connections = boardCurrentState.connections + 1;
-  socket.broadcast.emit('setBoardState', boardCurrentState);
+  socket.on("joinChannel", channelId => {
+    socket.join(channelId);
+    console.log(socket.id + " joined channel: " + channelId)
 
-  //Tell new client of current boardState
-  emitBoardState(socket);
+    //LOAD BOARD FROM MONGO HERE
+    // Send the board data to the user
+    Tile.findOne({_id:channelId}).then(board => {
+      boardCurrentState.tiles = board.boardData
+      socket.emit('setBoardState', boardCurrentState);
+		});
+    
+  })
 
+  socket.on("updateTiles", (channelId, tileUpdateData) => {
 
-  socket.on("updateTile", tileUpdateData => {
-    console.log("Tile change received" + tileUpdateData);
-    //boardCurrentState = desiredState;
+    console.log("Change received on channel " + channelId + ". " + tileUpdateData.length);
+    io.in(channelId).emit('updateTiles', tileUpdateData);
 
-    boardCurrentState.tiles[tileUpdateData.x][tileUpdateData.y] = tileUpdateData.color
-    socket.broadcast.emit('updateTile', tileUpdateData);
-  });
-
-  socket.on("updateTiles", tileUpdateData => {
-    console.log("Tile change received" + tileUpdateData);
     for (var i = 0; i < tileUpdateData.length; i++){
       boardCurrentState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color
+      
+      //update current board state
+      Tile.updateOne({_id:channelId},{
+        $set : {
+          ['boardData.' + tileUpdateData[i].x + '.' + tileUpdateData[i].y]: tileUpdateData[i].color
+        }
+      }).then(board => {
+        //console.log("sucess")
+      }).catch(error => {
+        console.log(error);
+      });
     }
-    socket.broadcast.emit('updateTiles', tileUpdateData);
+
+    //Add to the transaction log for the board.
+    Tile.updateOne({_id:channelId},{
+      $push : {
+        'boardLog': tileUpdateData
+      }
+    }).then(board => {
+      //console.log("sucess")
+    }).catch(error => {
+      console.log(error);
+    });
+    
+    
     
   });
 
   //Log disconnects
   socket.on("disconnect", () => {
-
-    boardCurrentState.connections = boardCurrentState.connections - 1;
-    socket.broadcast.emit('setBoardState', boardCurrentState);
+    //boardCurrentState.connections = boardCurrentState.connections - 1;
+    //socket.broadcast.emit('setBoardState', boardCurrentState);
     console.log("Client disconnected");
   });
 });
 
-// Function to broadcast board state
-const emitBoardState = async socket => {
-    socket.emit("setBoardState", boardCurrentState);
-    console.log("Board state emitted.");
-};
 
-// Tell server to start/listen
-server.listen(port, () => console.log(`Listening on port ${port}`));
+// InitializeDB and Tell server to start/listen
+connectDb().then(async () => {
+  server.listen(port, () => 
+    console.log(`Listening on port ${port}`)
+  );
+});
