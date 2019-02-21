@@ -44,19 +44,24 @@ var boardCurrentState = {
 // use below link to create 2D array function
 //https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
 
-
+var currentRoom;
 // Define basic socket events
 io.on("connection", socket => {
   console.log("New client connected");
+  
 
   socket.on("joinChannel", channelId => {
     socket.join(channelId);
     console.log(socket.id + " joined channel: " + channelId)
+    currentRoom = channelId
 
-    //LOAD BOARD FROM MONGO HERE
-    // Send the board data to the user
+    var clients = io.sockets.adapter.rooms[currentRoom].sockets;   
+    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+    socket.to(currentRoom).emit('updateConnections', numClients);
+
     Tile.findOne({_id:channelId}).then(board => {
       boardCurrentState.tiles = board.boardData
+      boardCurrentState.connections = numClients
       socket.emit('setBoardState', boardCurrentState);
 		});
     
@@ -105,6 +110,10 @@ io.on("connection", socket => {
     //boardCurrentState.connections = boardCurrentState.connections - 1;
     //socket.broadcast.emit('setBoardState', boardCurrentState);
     console.log("Client disconnected");
+    var clients = io.sockets.adapter.rooms[currentRoom].sockets;   
+    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+    socket.to(currentRoom).emit('updateConnections', numClients);
+
   });
 });
 
