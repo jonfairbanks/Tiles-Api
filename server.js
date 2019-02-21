@@ -86,6 +86,9 @@ io.on("connection", socket => {
     Tile.updateOne({_id:channelId},{
       $push : {
         'boardLog': tileUpdateData
+      },
+      $set : {
+        'lastUpdate': new Date().toISOString()
       }
     }).then(board => {
       //console.log("sucess")

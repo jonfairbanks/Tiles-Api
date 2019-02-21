@@ -11,7 +11,9 @@ const tileSchema = new mongoose.Schema({
   },
   boardLog: {
     type: Array
-  }
+  },
+  lastUpdate:{type:Date},
+  dateCreated:{type:Date}
 });
 
 module.exports = mongoose.model('Tile', tileSchema);
