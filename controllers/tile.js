@@ -30,6 +30,8 @@ exports.get = (req, res) => {
       var result = {}
       result.name = board.name
       result._id = board._id
+      result.lastUpdate = board.lastUpdate
+      result.dateCreated = board.dateCreated
 			res.json(result);
 		})
 		.catch(err => {
@@ -45,7 +47,9 @@ exports.post = (req, res) => {
   } else {
     var newTile = new Tile({
       name: req.body.name,
-      boardData: createTileGrid(135, 275, req.body.baseColor)
+      boardData: createTileGrid(135, 275, req.body.baseColor),
+      dateCreated: new Date().toISOString(),
+      lastUpdate: new Date().toISOString()
     });
     // save the user
     newTile.save(function(err) {
