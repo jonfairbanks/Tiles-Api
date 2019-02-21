@@ -32,6 +32,7 @@ exports.get = (req, res) => {
       result._id = board._id
       result.lastUpdate = board.lastUpdate
       result.dateCreated = board.dateCreated
+      result.updateCount = board.updateCount
 			res.json(result);
 		})
 		.catch(err => {
