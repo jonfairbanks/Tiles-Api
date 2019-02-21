@@ -58,12 +58,14 @@ io.on("connection", socket => {
     var clients = io.sockets.adapter.rooms[currentRoom].sockets;   
     var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
     socket.to(currentRoom).emit('updateConnections', numClients);
-
+    console.log(numClients);
     Tile.findOne({_id:channelId}).then(board => {
       boardCurrentState.tiles = board.boardData
       boardCurrentState.connections = numClients
       socket.emit('setBoardState', boardCurrentState);
-		});
+    });
+    
+    
     
   })
 
@@ -110,8 +112,9 @@ io.on("connection", socket => {
     //boardCurrentState.connections = boardCurrentState.connections - 1;
     //socket.broadcast.emit('setBoardState', boardCurrentState);
     console.log("Client disconnected");
-    var clients = io.sockets.adapter.rooms[currentRoom].sockets;   
-    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+
+    var room = io.sockets.adapter.rooms[currentRoom]
+    var numClients = (typeof room !== 'undefined') ? Object.keys(room.sockets).length : 0;
     socket.to(currentRoom).emit('updateConnections', numClients);
 
   });
