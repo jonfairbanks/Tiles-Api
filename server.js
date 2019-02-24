@@ -17,7 +17,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({'extended':'true'}));
 app.use(index);
 
-
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -29,7 +28,7 @@ function createTileGrid(width, height, baseColor){
     for (var i = 0 ; i < width; i++) {
         result[i] = [];
         for (var j = 0; j < height; j++) {
-            result[i][j] = baseColor;//(Math.random() * 5 | 0) + 6;
+            result[i][j] = baseColor; // (Math.random() * 5 | 0) + 6;
         }
     }
     return result;
@@ -41,8 +40,8 @@ var boardCurrentState = {
   baseColor: baseColor
 };
 
-// use below link to create 2D array function
-//https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
+// Use below link to create 2D array function
+// https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
 
 var currentRoom;
 // Define basic socket events
