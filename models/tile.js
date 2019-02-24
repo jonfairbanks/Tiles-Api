@@ -19,7 +19,6 @@ const tileSchema = new mongoose.Schema({
   },
   lastUpdate:{type:Date},
   dateCreated:{type:Date},
-
 },{
   toObject: { virtuals: true },
   toJSON: { virtuals: true }
