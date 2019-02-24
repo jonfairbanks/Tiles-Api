@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
+const shortid = require('shortid');
 
 const tileSchema = new mongoose.Schema({
+  _id: {
+    'type': String,
+    'default': shortid.generate
+  },
   name: {
     type: String,
     required: true,
