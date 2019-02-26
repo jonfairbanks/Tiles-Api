@@ -53,7 +53,7 @@ exports.post = (req, res) => {
       dateCreated: new Date().toISOString(),
       lastUpdate: new Date().toISOString()
     });
-    // save the user
+    // Save the user
     newTile.save(function(err) {
       if (err) {
         console.log(err);
