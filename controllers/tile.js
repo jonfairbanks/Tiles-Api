@@ -58,7 +58,6 @@ exports.post = (req, res) => {
       if (err) {
         console.log(err);
         return res.json({success: false, msg: 'Error saving tile'});
-
       }
       console.log('save success');
       res.json({success: true, boardId: newTile._id});
