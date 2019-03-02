@@ -1,4 +1,3 @@
-
 let Tile = require('../models/tile');
 
 // Retrieve a list of all tiles (optionally filter by url params)
