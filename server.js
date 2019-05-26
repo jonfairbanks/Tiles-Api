@@ -21,6 +21,13 @@ app.use(index);
 const server = http.createServer(app);
 const io = socketIo(server);
 
+if(process.env.Redis_Hostname){
+  var redis = require('socket.io-redis');
+  io.adapter(redis({ host: process.env.Redis_Hostname, port: 6379 }));
+}
+
+
+
 baseColor = '#222';
 activeColor = '#888';
 
