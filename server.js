@@ -62,7 +62,7 @@ io.on("connection", socket => {
     console.log(socket.id + " joined channel: " + channelId)
     currentRoom = channelId
 
-    var clients = io.sockets.clients(currentRoom);   
+    var clients = io.of('/').adapter.clients([currentRoom]) 
     var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
     socket.to(currentRoom).emit('updateConnections', numClients);
     console.log(numClients);
@@ -79,7 +79,7 @@ io.on("connection", socket => {
   socket.on("updateTiles", (channelId, tileUpdateData) => {
 
     console.log("Change received on channel " + channelId + ". " + tileUpdateData.length);
-    socket.in(channelId).emit('updateTiles', tileUpdateData);
+    io.in(channelId).emit('updateTiles', tileUpdateData);
 
     for (var i = 0; i < tileUpdateData.length; i++){
       boardCurrentState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color
