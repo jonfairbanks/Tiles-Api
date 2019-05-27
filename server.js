@@ -2,10 +2,10 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const axios = require("axios");
 const port = process.env.PORT || 4001;
 const index = require("./routes/index");
 const bodyParser = require('body-parser');
+const os = require('os');
 
 // Import models and initialize database
 const { connectDb } = require("./models");
@@ -62,13 +62,15 @@ io.on("connection", socket => {
     console.log(socket.id + " joined channel: " + channelId)
     currentRoom = channelId
 
-    var clients = io.of('/').adapter.rooms[currentRoom].sockets
-    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+    var room = io.sockets.adapter.rooms[currentRoom]
+    var numClients = (typeof room !== 'undefined') ? Object.keys(room.sockets).length : 0;
     socket.to(currentRoom).emit('updateConnections', numClients);
     console.log(numClients);
+
     Tile.findOne({_id:channelId}).then(board => {
       boardCurrentState.tiles = board.boardData
       boardCurrentState.connections = numClients
+      boardCurrentState.apiHost = os.hostname()
       socket.emit('setBoardState', boardCurrentState);
     });
     
