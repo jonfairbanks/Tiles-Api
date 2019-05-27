@@ -62,7 +62,7 @@ io.on("connection", socket => {
     console.log(socket.id + " joined channel: " + channelId)
     currentRoom = channelId
 
-    var clients = io.sockets.adapter.rooms[currentRoom].sockets;   
+    var clients = io.sockets.clients(currentRoom);   
     var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
     socket.to(currentRoom).emit('updateConnections', numClients);
     console.log(numClients);
