@@ -79,7 +79,7 @@ io.on("connection", socket => {
   socket.on("updateTiles", (channelId, tileUpdateData) => {
 
     console.log("Change received on channel " + channelId + ". " + tileUpdateData.length);
-    io.in(channelId).emit('updateTiles', tileUpdateData);
+    socket.in(channelId).emit('updateTiles', tileUpdateData);
 
     for (var i = 0; i < tileUpdateData.length; i++){
       boardCurrentState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color
