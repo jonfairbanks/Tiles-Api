@@ -124,9 +124,12 @@ io.on("connection", socket => {
     //socket.broadcast.emit('setBoardState', boardCurrentState);
     console.log("Client disconnected");
 
-    var room = io.sockets.adapter.rooms[currentRoom]
-    var numClients = (typeof room !== 'undefined') ? Object.keys(room.sockets).length : 0;
-    socket.to(currentRoom).emit('updateConnections', numClients);
+    io.of('/').in(currentRoom).clients((error, clients) => {
+      if (error) throw error;
+      console.log(os.hostname() + " has clients: " + clients); // => [Anw2LatarvGVVXEIAAAD]
+      console.log(clients.length)
+      socket.to(currentRoom).emit('updateConnections', clients.length);
+    });
 
   });
 });
