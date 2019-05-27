@@ -62,20 +62,22 @@ io.on("connection", socket => {
     console.log(socket.id + " joined channel: " + channelId)
     currentRoom = channelId
 
-    var room = io.sockets.adapter.rooms[currentRoom]
-    var numClients = (typeof room !== 'undefined') ? Object.keys(room.sockets).length : 0;
-    socket.to(currentRoom).emit('updateConnections', numClients);
-    console.log(numClients);
 
-    Tile.findOne({_id:channelId}).then(board => {
-      boardCurrentState.tiles = board.boardData
-      boardCurrentState.connections = numClients
-      boardCurrentState.apiHost = os.hostname()
-      socket.emit('setBoardState', boardCurrentState);
+    io.of('/').in(currentRoom).clients((error, clients) => {
+      if (error) throw error;
+      console.log(os.hostname() + " has clients: " + clients); // => [Anw2LatarvGVVXEIAAAD]
+      console.log(clients.length)
+      socket.to(currentRoom).emit('updateConnections', clients.length);
+
+      Tile.findOne({_id:channelId}).then(board => {
+        boardCurrentState.tiles = board.boardData
+        boardCurrentState.connections = clients.length
+        boardCurrentState.apiHost = os.hostname()
+        socket.emit('setBoardState', boardCurrentState);
+      });
+
     });
-    
-    
-    
+
   })
 
   socket.on("updateTiles", (channelId, tileUpdateData) => {
