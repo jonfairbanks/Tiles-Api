@@ -72,7 +72,7 @@ io.on("connection", socket => {
       Tile.findOne({_id:channelId}).then(board => {
         boardCurrentState.tiles = board.boardData
         boardCurrentState.connections = clients.length
-        boardCurrentState.apiHost = os.hostname()
+        boardCurrentState.apiHost = socket.handshake.address + " is connecting to: " + os.hostname()
         socket.emit('setBoardState', boardCurrentState);
       });
 
