@@ -10,6 +10,13 @@ router.get("/", (req,res) => {
      (req.connection.socket ? req.connection.socket.remoteAddress : "Unknown");
   res.send({ response: {msg:"I am alive", host: os.hostname(), clientSourceIP: ip}}).status(200);
 });
+router.get("/apihealth", (req,res) => {
+  var ip = req.headers['x-forwarded-for'] || 
+     req.connection.remoteAddress || 
+     req.socket.remoteAddress ||
+     (req.connection.socket ? req.connection.socket.remoteAddress : "Unknown");
+  res.send({ response: {msg:"I am alive", host: os.hostname(), clientSourceIP: ip}}).status(200);
+});
 
 router.get("/tiles", Tile.list)
 router.get("/tiles/:boardId", Tile.get)
