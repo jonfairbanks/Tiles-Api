@@ -62,21 +62,12 @@ io.on("connection", socket => {
     console.log(socket.id + " joined channel: " + channelId)
     currentRoom = channelId
 
-
-    io.of('/').in(currentRoom).clients((error, clients) => {
-      if (error) throw error;
-      console.log(os.hostname() + " has clients: " + clients); // => [Anw2LatarvGVVXEIAAAD]
-      console.log(clients.length)
-      socket.to(currentRoom).emit('updateConnections', clients.length);
-
       Tile.findOne({_id:channelId}).then(board => {
         boardCurrentState.tiles = board.boardData
-        boardCurrentState.connections = clients.length
+        boardCurrentState.connections = 0
         boardCurrentState.apiHost = socket.handshake.address + " is connecting to: " + os.hostname()
         socket.emit('setBoardState', boardCurrentState);
       });
-
-    });
 
   })
 
@@ -123,13 +114,7 @@ io.on("connection", socket => {
     //boardCurrentState.connections = boardCurrentState.connections - 1;
     //socket.broadcast.emit('setBoardState', boardCurrentState);
     console.log("Client disconnected");
-
-    io.of('/').in(currentRoom).clients((error, clients) => {
-      if (error) throw error;
-      console.log(os.hostname() + " has clients: " + clients); // => [Anw2LatarvGVVXEIAAAD]
-      console.log(clients.length)
-      socket.to(currentRoom).emit('updateConnections', clients.length);
-    });
+    socket.to(currentRoom).emit('updateConnections', 0);
 
   });
 });
