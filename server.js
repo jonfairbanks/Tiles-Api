@@ -57,17 +57,22 @@ io.on("connection", socket => {
   console.log("New client connected");
   
 
-  socket.on("joinChannel", channelId => {
+  socket.on("joinChannel", (channelId,username) => {
     socket.join(channelId);
-    console.log(socket.id + " joined channel: " + channelId)
+    socket.username = username
+
+    console.log(socket.id + "/" + username + " joined channel: " + channelId)
     currentRoom = channelId
 
       Tile.findOne({_id:channelId}).then(board => {
         boardCurrentState.tiles = board.boardData
         boardCurrentState.connections = 0
+        boardCurrentState.messages = board.boardMessages
         boardCurrentState.apiHost = socket.handshake.address + " is connecting to: " + os.hostname()
         socket.emit('setBoardState', boardCurrentState);
       });
+
+    socket.to(channelId).emit('userJoined', username)
 
   })
 
@@ -110,12 +115,27 @@ io.on("connection", socket => {
   });
 
   //Log disconnects
-  socket.on("disconnect", () => {
-    //boardCurrentState.connections = boardCurrentState.connections - 1;
-    //socket.broadcast.emit('setBoardState', boardCurrentState);
-    console.log("Client disconnected");
-    socket.to(currentRoom).emit('updateConnections', 0);
+  socket.on("message", (channelId, message) => {
+    console.log("message received");
+    io.in(currentRoom).emit('message', message);
+    Tile.updateOne({_id:currentRoom},{
+      $push : {
+        'boardMessages': message
+      },
+      $set : {
+        'lastUpdate': new Date().toISOString()
+      }
+    }).then(board => {
+      //console.log("sucess")
+    }).catch(error => {
+      console.log(error);
+    });
+  });
 
+  //Log disconnects
+  socket.on("disconnect", () => {
+    console.log(socket.id + "/" + socket.username + " left channel: " + currentRoom)
+    socket.to(currentRoom).emit('userLeft', socket.username)
   });
 });
 

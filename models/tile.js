@@ -17,6 +17,9 @@ const tileSchema = new mongoose.Schema({
   boardLog: {
     type: Array
   },
+  boardMessages: {
+    type: Array
+  },
   lastUpdate:{type:Date},
   dateCreated:{type:Date},
 
