@@ -1,3 +1,4 @@
+
 // Import dependencies
 const express = require("express");
 const http = require("http");
@@ -145,4 +146,5 @@ connectDb().then(async () => {
   server.listen(port, () => 
     console.log(`Listening on port ${port}`)
   );
+
 });

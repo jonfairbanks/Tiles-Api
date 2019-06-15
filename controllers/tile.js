@@ -74,7 +74,7 @@ function createTileGrid(width, height, baseColor){
   for (var i = 0 ; i < width; i++) {
       result[i] = [];
       for (var j = 0; j < height; j++) {
-          result[i][j] = baseColor;//(Math.random() * 5 | 0) + 6;
+          result[i][j] = baseColor;// (Math.random() * 5 | 0) + 6;
       }
   }
   return result;

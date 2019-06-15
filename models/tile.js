@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const shortid = require('shortid');
 
@@ -31,5 +32,6 @@ const tileSchema = new mongoose.Schema({
 tileSchema.virtual('updateCount').get(function() {  
   return this.boardLog.length
 });
+
 
 module.exports = mongoose.model('Tile', tileSchema);
