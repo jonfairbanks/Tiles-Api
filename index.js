@@ -27,7 +27,7 @@ if(process.env.Redis_Hostname){
 // Tell socket events to go to socket handler. Similar to how routes work
 io.on("connection", socket => {
   console.log("New client connected");
-  socketsHandler(socket)
+  socketsHandler(io, socket)
 });
 
 module.exports = server;
