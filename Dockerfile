@@ -30,10 +30,9 @@ CMD ["npm", "run", "test"]
 FROM test as audit
 USER root
 RUN npm audit --audit-level critical
-ARG MICROSCANNER_TOKEN
 ADD https://get.aquasec.com/microscanner /
 RUN chmod +x /microscanner
-RUN /microscanner $MICROSCANNER_TOKEN --continue-on-failure
+RUN /microscanner ${MICROSCANNER_TOKEN} --continue-on-failure
 
 FROM source as prod
 ENTRYPOINT ["/tini", "--"]
