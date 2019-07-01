@@ -1,41 +1,41 @@
-FROM node:10
-
-# Set default node environment to production
-ARG NODE_ENV=production
-ENV NODE_ENV $NODE_ENV
-
-# Set default node port to 3000, and 9229 and 9230 (tests) for debug
-ARG PORT=3000
-ENV PORT $PORT
-EXPOSE $PORT 9229 9230
-
-# Install latest NPM. Pin to version for stability
-RUN npm i npm@latest -g
-
-# Create app directy and set owner to the non root user we will run the app under 
-RUN mkdir /opt/node_app && chown node:node /opt/node_app
-
-# Change work directory to app directory
-WORKDIR /opt/node_app
-
-# Switch to non root user context
+FROM node:12-slim as base
+ENV NODE=ENV=production
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+EXPOSE 3000
+RUN mkdir /app && chown -R node:node /app
+WORKDIR /app
 USER node
+COPY --chown=node:node package.json package-lock*.json ./
+RUN npm ci && npm cache clean --force
 
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm install --no-optional && npm cache clean --force
-ENV PATH /opt/node_app/node_modules/.bin:$PATH
+FROM base as dev
+ENV NODE_ENV=development
+ENV PATH=/app/node_modules/.bin:$PATH
+RUN npm install --only=development
+CMD ["nodemon", "./bin/www", "--inspect=0.0.0.0:9229"]
 
-# Check service status every 30 seconds
-HEALTHCHECK --interval=30s CMD node healthcheck.js
+FROM base as source
+COPY --chown=node:node . .
 
-# Copy source code last as it changes most
-WORKDIR /opt/node_app/app
-COPY . .
+FROM source as test
+ENV NODE_ENV=development
+ENV PATH=/app/node_modules/.bin:$PATH
+COPY --from=dev /app/node_modules /app/node_modules
+RUN eslint .
+RUN npm test
+CMD ["npm", "run", "test"]
 
-# Copy entrypoint
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
+FROM test as audit
+USER root
+RUN npm audit --audit-level critical
+ARG MICROSCANNER_TOKEN
+ADD https://get.aquasec.com/microscanner /
+RUN chmod +x /microscanner
+RUN /microscanner $MICROSCANNER_TOKEN --continue-on-failure
 
+FROM source as prod
+ENTRYPOINT ["/tini", "--"]
 CMD ["node", "./bin/www"]
 

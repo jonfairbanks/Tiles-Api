@@ -5,21 +5,12 @@ services:
   node:
     build:
       context: .
-      args:
-        - NODE_ENV=development
-    command: ../node_modules/.bin/nodemon --inspect=0.0.0.0:9229 ./bin/www
+      target: dev
     ports:
       - "4001:3000"
-      - "9229:9229"
-      - "9230:9230"
     volumes:
-      - .:/opt/node_app/app:delegated
-      - ./package.json:/opt/node_app/package.json
-      - ./package-lock.json:/opt/node_app/package-lock.json
-      - notused:/opt/node_app/app/node_modules
+      - .:/app:delegated
     environment:
       - MongoURI=${MongoURI}
     healthcheck:
       disable: true
-volumes:
-  notused:

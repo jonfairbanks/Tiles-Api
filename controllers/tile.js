@@ -43,7 +43,6 @@ exports.get = (req, res) => {
 
 // Create a new tile
 exports.post = (req, res) => {
-  console.log(req.body)
 	if (!req.body.name) {
     res.json({success: false, msg: 'Please provide a name'});
   } else {
@@ -56,11 +55,9 @@ exports.post = (req, res) => {
     // save the user
     newTile.save(function(err) {
       if (err) {
-        console.log(err);
         return res.json({success: false, msg: 'Error saving tile'});
 
       }
-      console.log('save success');
       res.json({success: true, boardId: newTile._id});
 
     });

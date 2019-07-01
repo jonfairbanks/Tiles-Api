@@ -5,6 +5,7 @@ const socketIo = require("socket.io");
 const index = require("./routes/index");
 const socketsHandler = require("./routes/socket");
 const bodyParser = require('body-parser');
+const stoppable = require('stoppable');
 
 // Initialize database models and connect.
 const { connectDb } = require("./models");
@@ -15,7 +16,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({'extended':'true'}));
 app.use(index);
-const server = http.createServer(app);
+const server = stoppable(http.createServer(app));
 const io = socketIo(server);
 
 // Tell socket.io to use redis adapter if specified
@@ -26,7 +27,6 @@ if(process.env.Redis_Hostname){
 
 // Tell socket events to go to socket handler. Similar to how routes work
 io.on("connection", socket => {
-  console.log("New client connected");
   socketsHandler(io, socket)
 });
 

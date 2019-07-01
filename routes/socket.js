@@ -1,27 +1,19 @@
 const os = require('os');
 const Tile = require("../models/tile");
 
-baseColor = '#222';
-activeColor = '#888';
-
 var boardCurrentState = {
   connections: 0,
-  activeColor: activeColor,
-  baseColor: baseColor
 };
-
-// use below link to create 2D array function
-//https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript/966938#966938
 
 var currentRoom;
 
-module.exports = function(socket) {
+module.exports = function(io, socket) {
 
   socket.on("joinChannel", (channelId,username) => {
     socket.join(channelId);
     socket.username = username
 
-    console.log(socket.id + "/" + username + " joined channel: " + channelId)
+    //console.log(socket.id + "/" + username + " joined channel: " + channelId)
     currentRoom = channelId
 
       Tile.findOne({_id:channelId}).then(board => {
@@ -38,7 +30,7 @@ module.exports = function(socket) {
 
   socket.on("updateTiles", (channelId, tileUpdateData) => {
 
-    console.log("Change received on channel " + channelId + ". " + tileUpdateData.length);
+    //console.log("Change received on channel " + channelId + ". " + tileUpdateData.length);
     socket.to(channelId).emit('updateTiles', tileUpdateData);
 
     for (var i = 0; i < tileUpdateData.length; i++){
@@ -49,10 +41,10 @@ module.exports = function(socket) {
         $set : {
           ['boardData.' + tileUpdateData[i].x + '.' + tileUpdateData[i].y]: tileUpdateData[i].color
         }
-      }).then(board => {
+      }).then({
         //console.log("sucess")
-      }).catch(error => {
-        console.log(error);
+      }).catch({
+        //console.log(error);
       });
     }
 
@@ -64,19 +56,19 @@ module.exports = function(socket) {
       $set : {
         'lastUpdate': new Date().toISOString()
       }
-    }).then(board => {
+    }).then({
       //console.log("sucess")
-    }).catch(error => {
-      console.log(error);
+    }).catch({
+      //console.log(error);
     });
     
     
     
   });
 
-  //Log disconnects
+  //Handle messages
   socket.on("message", (channelId, message) => {
-    console.log("message received");
+    //console.log("message received");
     io.in(currentRoom).emit('message', message);
     Tile.updateOne({_id:currentRoom},{
       $push : {
@@ -85,16 +77,16 @@ module.exports = function(socket) {
       $set : {
         'lastUpdate': new Date().toISOString()
       }
-    }).then(board => {
+    }).then({
       //console.log("sucess")
-    }).catch(error => {
-      console.log(error);
+    }).catch({
+      //console.log(error);
     });
   });
 
   //Log disconnects
   socket.on("disconnect", () => {
-    console.log(socket.id + "/" + socket.username + " left channel: " + currentRoom)
+    //console.log(socket.id + "/" + socket.username + " left channel: " + currentRoom)
     socket.to(currentRoom).emit('userLeft', socket.username)
   });
 
