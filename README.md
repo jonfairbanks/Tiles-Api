@@ -8,7 +8,7 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/fairbanksio/tiles-api.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fairbanks-io/tiles-api.svg)
 
-Backend API for [Tiles](https://github.com/Fairbanks-io/tiles-client)
+Backend API for [Tiles](https://github.com/Fairbanks-io/tiles-client); helps with creating/saving boards, authenticating users and managing chatrooms.
 
 ## Getting Started
 
