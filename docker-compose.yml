@@ -1,0 +1,16 @@
+version: '2.3'
+
+services:
+
+  node:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "4001:3000"
+    volumes:
+      - .:/app:delegated
+    environment:
+      - MongoURI=${MongoURI}
+    healthcheck:
+      disable: true
