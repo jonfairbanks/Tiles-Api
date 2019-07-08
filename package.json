@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "API for Tiles",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fairbanks-io/tiles-api.git"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Warning: no test(s) specified\" && exit 0",
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "lint-fix": "./node_modules/eslint/bin/eslint.js . --fix"
   },
