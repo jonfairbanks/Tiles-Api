@@ -1,10 +1,16 @@
 {
   "name": "tiles-api",
   "version": "1.0.0",
-  "description": "Api for tiles client",
+  "description": "API for Tiles",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fairbanks-io/tiles-api.git"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test(s) specified\" && exit 0",
+    "lint": "./node_modules/eslint/bin/eslint.js .",
+    "lint-fix": "./node_modules/eslint/bin/eslint.js . --fix"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +20,11 @@
     "express": "^4.16.3",
     "mongoose": "^5.4.13",
     "shortid": "^2.2.14",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "stoppable": "^1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "nodemon": "^1.19.1"
   }
 }
